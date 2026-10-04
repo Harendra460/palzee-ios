@@ -35,10 +35,10 @@ export default function OnboardingScreen({
   const [isPasskeyTriggered, setIsPasskeyTriggered] = useState(false);
 
   // Animated Entrance Values
-  const cloudAnim = useRef(new Animated.Value(0)).current;
-  const doodlesAnim = useRef(new Animated.Value(0)).current;
-  const textAnim = useRef(new Animated.Value(0)).current;
-  const buttonsAnim = useRef(new Animated.Value(0)).current;
+  const cloudAnim = useRef(new Animated.Value(1)).current;
+  const doodlesAnim = useRef(new Animated.Value(1)).current;
+  const textAnim = useRef(new Animated.Value(1)).current;
+  const buttonsAnim = useRef(new Animated.Value(1)).current;
 
   useEffect(() => {
     // Sequential pop-in entrance animation matching reference video

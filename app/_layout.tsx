@@ -55,7 +55,9 @@ LogBox.ignoreLogs([
   'SDK 54',
 ]);
 
-SplashScreen.preventAutoHideAsync();
+import { ActivityIndicator, View } from 'react-native';
+
+SplashScreen.preventAutoHideAsync().catch(() => {});
 
 export default function RootLayout() {
   const [loaded, error] = useFonts({
@@ -79,13 +81,24 @@ export default function RootLayout() {
       staysActiveInBackground: false,
     }).catch(() => {});
 
+    // Safety timeout to guarantee splash screen dismisses and never gets stuck
+    const timer = setTimeout(() => {
+      SplashScreen.hideAsync().catch(() => {});
+    }, 600);
+
     if (loaded || error) {
-      SplashScreen.hideAsync();
+      SplashScreen.hideAsync().catch(() => {});
     }
+
+    return () => clearTimeout(timer);
   }, [loaded, error]);
 
   if (!loaded && !error) {
-    return null;
+    return (
+      <View style={{ flex: 1, backgroundColor: '#090A0E', justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color="#FF5232" />
+      </View>
+    );
   }
 
   return (
