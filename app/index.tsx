@@ -15,15 +15,20 @@ export default function Index() {
 
   useEffect(() => {
     async function initSession() {
-      // Check and pre-warm camera & microphone permissions on follow-up app openings
-      cameraWarmupStore.checkAndWarmupPermissions();
-
-      const user = await sessionStore.getUser();
-      // Pick a fresh random theme color every time app opens
-      const randomColor = sessionStore.getRandomThemeColor();
-      setCurrentUser(user);
-      setSelectedThemeColor(randomColor);
-      setLoading(false);
+      try {
+        cameraWarmupStore.checkAndWarmupPermissions().catch(() => {});
+        const user = await Promise.race([
+          sessionStore.getUser(),
+          new Promise<null>((res) => setTimeout(() => res(null), 800)),
+        ]);
+        const randomColor = sessionStore.getRandomThemeColor();
+        setCurrentUser(user);
+        setSelectedThemeColor(randomColor);
+      } catch (e) {
+        console.warn('Session init error:', e);
+      } finally {
+        setLoading(false);
+      }
     }
     initSession();
   }, []);
