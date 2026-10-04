@@ -26,6 +26,7 @@
 		BB2F792D24A3F905000567C9 /* Expo.plist in Resources */ = {isa = PBXBuildFile; fileRef = BB2F792C24A3F905000567C9 /* Expo.plist */; };
 		E73A0F4D4FE44DF78CC1B6FA /* google_sans_regular.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 8541F1E4B67A46019141016B /* google_sans_regular.ttf */; };
 		F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748412D0307B40044C1D9 /* AppDelegate.swift */; };
+		F11748522D0307B40044C1D9 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = F11748512D0307B40044C1D9 /* SceneDelegate.swift */; };
 		FB0D9A61F3AD4BD99CD9CCA8 /* ownglyph.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 14CFEE246FBB4A06A79FC937 /* ownglyph.ttf */; };
 		FD2B33E8CDF14C10B8BEF6CE /* roboto_medium_numbers.ttf in Resources */ = {isa = PBXBuildFile; fileRef = 3812D25A1CE7430DBEBB13ED /* roboto_medium_numbers.ttf */; };
 /* End PBXBuildFile section */
@@ -56,6 +57,7 @@
 		E4E9E60CC55F4D3A8981352E /* dela_gothic_one_regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = dela_gothic_one_regular.ttf; path = ../assets/fonts/dela_gothic_one_regular.ttf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Palzee/AppDelegate.swift; sourceTree = "<group>"; };
+		F11748512D0307B40044C1D9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = Palzee/SceneDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Palzee-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Palzee-Bridging-Header.h"; path = "Palzee/Palzee-Bridging-Header.h"; sourceTree = "<group>"; };
 		F140B3DCB53060C27CDDF6FC /* Pods-Palzee.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Palzee.debug.xcconfig"; path = "Target Support Files/Pods-Palzee/Pods-Palzee.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -76,6 +78,7 @@
 			isa = PBXGroup;
 			children = (
 				F11748412D0307B40044C1D9 /* AppDelegate.swift */,
+				F11748512D0307B40044C1D9 /* SceneDelegate.swift */,
 				B10010022E00000100000000 /* VideoExporter.swift */,
 				B10010042E00000100000000 /* VideoExporter.m */,
 				F11748442D0722820044C1D9 /* Palzee-Bridging-Header.h */,
@@ -401,6 +404,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				F11748422D0307B40044C1D9 /* AppDelegate.swift in Sources */,
+				F11748522D0307B40044C1D9 /* SceneDelegate.swift in Sources */,
 				B10010012E00000100000000 /* VideoExporter.swift in Sources */,
 				B10010032E00000100000000 /* VideoExporter.m in Sources */,
 				A206BFD08235E2655CD4FA43 /* ExpoModulesProvider.swift in Sources */,

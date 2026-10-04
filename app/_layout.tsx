@@ -5,46 +5,6 @@ import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
 import { Audio } from 'expo-av';
 
-const shouldSuppressExpoAv = (...args: any[]) => {
-  try {
-    const fullMsg = args
-      .map((a) => (typeof a === 'string' ? a : JSON.stringify(a || '')))
-      .join(' ');
-    return (
-      fullMsg.includes('expo-av') ||
-      fullMsg.includes('expo-video') ||
-      fullMsg.includes('Video component') ||
-      fullMsg.includes('deprecated in favor of')
-    );
-  } catch (e) {
-    return false;
-  }
-};
-
-const originalWarn = console.warn;
-console.warn = (...args: any[]) => {
-  if (shouldSuppressExpoAv(...args)) return;
-  originalWarn(...args);
-};
-
-const originalError = console.error;
-console.error = (...args: any[]) => {
-  if (shouldSuppressExpoAv(...args)) return;
-  originalError(...args);
-};
-
-const originalLog = console.log;
-console.log = (...args: any[]) => {
-  if (shouldSuppressExpoAv(...args)) return;
-  originalLog(...args);
-};
-
-const originalInfo = console.info;
-console.info = (...args: any[]) => {
-  if (shouldSuppressExpoAv(...args)) return;
-  originalInfo(...args);
-};
-
 LogBox.ignoreLogs([
   '[expo-av]',
   'Expo AV has been deprecated',
