@@ -21,6 +21,7 @@ yarn-error.log*
 *.mov
 
 # iOS Native Build Files & Xcode DerivedData
+build/
 ios/Pods/
 ios/build/
 ios/DerivedData/
