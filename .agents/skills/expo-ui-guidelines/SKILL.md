@@ -17,8 +17,14 @@ Use this skill whenever creating or modifying iOS screens, components, modals, b
 2. **Apple SF Symbols (`expo-symbols`)**:
    - Prefer native SF Symbols for system buttons, checks, arrows, and camera controls.
 
-3. **Liquid Glass & Backdrop Effects (`expo-blur`)**:
-   - Combine `BlurView` with liquid specular borders (`#FFFFFF` @ 0.45) for floating pills, dynamic edge glows, and card containers.
+3. **Liquid Glass & Meta-Material Effects (`expo-blur`, `react-native-svg`)**:
+   - Use standardized material variants:
+     - `.regular`: Default balanced depth (45 intensity) for floating navigation pills, action buttons, and capsules.
+     - `.clear`: High-transparency overlay (25 intensity) for viewfinder controls, camera buttons, and vlog media playback.
+     - `.prominent`: Elevated depth (65 intensity) for modal sheets and alert dialogs.
+   - Employ continuous super-ellipse squircles (`borderCurve: 'continuous'`) with concentric inner radii (`rx - strokeWidth`).
+   - Dynamic multi-stop specular highlights (`#FFFFFF` with angle falloffs) without heavy opaque fills.
+   - Built-in accessibility fallbacks when iOS *Reduce Transparency* is active.
 
 4. **Fluid Navigation & Modals**:
    - Native Expo Router stack screens, sheet presentation options, and smooth tab bar pill interactions.
