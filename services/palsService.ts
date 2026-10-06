@@ -122,6 +122,16 @@ export const palsService = {
     }));
   },
 
+  /** Member count per group in a single query. */
+  async memberCounts(codes: string[]): Promise<Record<string, number>> {
+    if (codes.length === 0) return {};
+    const { data, error } = await supabase.from('user_pals').select('pal_code').in('pal_code', codes);
+    if (error) throw error;
+    const counts: Record<string, number> = {};
+    for (const row of data ?? []) counts[row.pal_code] = (counts[row.pal_code] ?? 0) + 1;
+    return counts;
+  },
+
   /** Profile edits propagate to every membership row, as on Android. */
   async updateMyProfile(userId: string, changes: { displayName?: string; avatarUrl?: string | null }): Promise<void> {
     const patch: Record<string, string | null> = {};

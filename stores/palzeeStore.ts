@@ -8,11 +8,16 @@ import { subscribeToPalzeeChanges } from '../services/realtimeService';
 import { pushService } from '../services/pushService';
 import { storageService } from '../services/storageService';
 import { firstNameOf, VLOG_PAL_CODE } from '../services/encoding';
+import { chatService, ClipInteractions } from '../services/chatService';
 
 interface PalzeeState {
+  /** False until the persisted session has been checked at startup. */
+  ready: boolean;
   user: User | null;
   groups: PalGroup[];
   feed: Moment[];
+  /** Reactions/replies per clip URL for moments in the feed. */
+  interactions: Record<string, ClipInteractions>;
   pendingUploads: number;
   loading: boolean;
   error: string | null;
@@ -31,7 +36,9 @@ interface PalzeeState {
   deleteGroup(code: string): Promise<void>;
   /** Posts a capture to the selected groups and/or the personal vlog ('vlog'). */
   postMoment(targets: string[], moment: NewMoment): Promise<void>;
-  updateProfile(changes: { displayName?: string; avatarLocalUri?: string | null }): Promise<void>;
+  updateProfile(changes: { displayName?: string; bio?: string; avatarLocalUri?: string | null }): Promise<void>;
+  /** One emoji per user per clip (replaces any previous reaction). */
+  react(moment: Moment, emoji: string): Promise<void>;
 }
 
 let teardown: (() => void) | null = null;
@@ -48,17 +55,23 @@ function profileOf(user: User) {
 }
 
 export const usePalzeeStore = create<PalzeeState>((set, get) => ({
+  ready: false,
   user: null,
   groups: [],
   feed: [],
+  interactions: {},
   pendingUploads: 0,
   loading: false,
   error: null,
 
   async restoreSession() {
-    const user = await authService.currentUser();
-    if (user) await get().signedIn(user);
-    return user;
+    try {
+      const user = await authService.currentUser();
+      if (user) await get().signedIn(user);
+      return user;
+    } finally {
+      set({ ready: true });
+    }
   },
 
   async signedIn(user) {
@@ -90,7 +103,7 @@ export const usePalzeeStore = create<PalzeeState>((set, get) => ({
     teardown?.();
     teardown = null;
     await authService.signOut();
-    set({ user: null, groups: [], feed: [], pendingUploads: 0 });
+    set({ user: null, groups: [], feed: [], interactions: {}, pendingUploads: 0 });
   },
 
   async deleteAccount() {
@@ -99,7 +112,7 @@ export const usePalzeeStore = create<PalzeeState>((set, get) => ({
     teardown?.();
     teardown = null;
     await authService.softDeleteAccount(user.id);
-    set({ user: null, groups: [], feed: [], pendingUploads: 0 });
+    set({ user: null, groups: [], feed: [], interactions: {}, pendingUploads: 0 });
   },
 
   async refresh() {
@@ -109,14 +122,13 @@ export const usePalzeeStore = create<PalzeeState>((set, get) => ({
     try {
       const { groups } = await palsService.listGroups(user.id);
       const since = new Date(Date.now() - 8 * 24 * 3600 * 1000);
-      const [feed, pendingUploads] = await Promise.all([
-        momentsService.listFeed(
-          groups.map((g) => g.code),
-          since
-        ),
+      const codes = groups.map((g) => g.code);
+      const [feed, interactions, pendingUploads] = await Promise.all([
+        momentsService.listFeed(codes, since),
+        chatService.listInteractions(codes, since),
         momentsService.pendingCount(),
       ]);
-      set({ groups, feed, pendingUploads, error: null });
+      set({ groups, feed, interactions, pendingUploads, error: null });
     } catch (e: any) {
       set({ error: e?.message ?? 'Could not load your pals.' });
     } finally {
@@ -161,14 +173,36 @@ export const usePalzeeStore = create<PalzeeState>((set, get) => ({
     set({ pendingUploads: await momentsService.pendingCount() });
   },
 
-  async updateProfile({ displayName, avatarLocalUri }) {
+  async react(moment, emoji) {
+    const user = get().user!;
+    const key = moment.clip.videoUrl;
+    const prev = get().interactions;
+    const entry = prev[key] ?? { reactions: [], replies: [] };
+    set({
+      interactions: {
+        ...prev,
+        [key]: {
+          ...entry,
+          reactions: [...entry.reactions.filter((r) => r.userId !== user.id), { userId: user.id, emoji, messageId: 'optimistic' }],
+        },
+      },
+    });
+    try {
+      await chatService.react(moment.palCode, user.id, { userId: moment.userId, firstName: moment.authorName, clipPath: key }, emoji);
+    } catch (e) {
+      set({ interactions: prev });
+      throw e;
+    }
+  },
+
+  async updateProfile({ displayName, bio, avatarLocalUri }) {
     const user = get().user!;
     let avatarUrl = user.avatarUrl ?? null;
     if (avatarLocalUri !== undefined) {
       avatarUrl = avatarLocalUri ? await storageService.uploadAvatar(avatarLocalUri) : null;
     }
-    await authService.updateProfileMetadata({ displayName, avatarUrl });
+    await authService.updateProfileMetadata({ displayName, avatarUrl, bio });
     await palsService.updateMyProfile(user.id, { displayName, avatarUrl });
-    set({ user: { ...user, displayName: displayName ?? user.displayName, avatarUrl } });
+    set({ user: { ...user, displayName: displayName ?? user.displayName, bio: bio ?? user.bio, avatarUrl } });
   },
 }));

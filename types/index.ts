@@ -5,6 +5,7 @@ export interface User {
   isPasskeyRegistered: boolean;
   authProvider?: string;
   avatarUrl?: string | null;
+  bio?: string;
 }
 
 export enum UserRouteState {

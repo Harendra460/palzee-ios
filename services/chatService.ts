@@ -19,7 +19,36 @@ function rowToMessage(row: any): ChatMessage {
   };
 }
 
+/** Reactions and replies attached to one clip (keyed by the clip's stored video URL, like Android). */
+export interface ClipInteractions {
+  reactions: { userId: string; emoji: string; messageId: string }[];
+  replies: ChatMessage[];
+}
+
 export const chatService = {
+  /** Reactions/replies across several groups, grouped by clip path. */
+  async listInteractions(palCodes: string[], since?: Date): Promise<Record<string, ClipInteractions>> {
+    if (palCodes.length === 0) return {};
+    let query = supabase
+      .from('messages')
+      .select('*')
+      .in('pal_code', palCodes)
+      .or('message_text.like.REACTION|||%,message_text.like.REPLY|||%')
+      .order('created_at', { ascending: true });
+    if (since) query = query.gte('created_at', since.toISOString());
+    const { data, error } = await query.limit(2000);
+    if (error) throw error;
+    const byClip: Record<string, ClipInteractions> = {};
+    for (const msg of (data ?? []).map(rowToMessage)) {
+      const body = msg.body;
+      if (body.kind !== 'reaction' && body.kind !== 'reply') continue;
+      const entry = (byClip[body.clipPath] ??= { reactions: [], replies: [] });
+      if (body.kind === 'reaction') entry.reactions.push({ userId: msg.userId, emoji: body.emoji, messageId: msg.id });
+      else entry.replies.push(msg);
+    }
+    return byClip;
+  },
+
   async listMessages(palCode: string): Promise<ChatMessage[]> {
     const { data, error } = await supabase
       .from('messages')

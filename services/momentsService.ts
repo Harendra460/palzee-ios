@@ -139,6 +139,19 @@ export const momentsService = {
     return (data ?? []).map(rowToMoment).filter(Boolean) as Moment[];
   },
 
+  /** The user's own clips across every group and the personal vlog, plus the exact total. */
+  async listMine(userId: string, limit = 300): Promise<{ moments: Moment[]; total: number }> {
+    const { data, error, count } = await supabase
+      .from('submissions')
+      .select('*', { count: 'exact' })
+      .eq('user_id', userId)
+      .neq('image_url', PROFILE_AVATAR_SENTINEL)
+      .order('created_at', { ascending: false })
+      .limit(limit);
+    if (error) throw error;
+    return { moments: (data ?? []).map(rowToMoment).filter(Boolean) as Moment[], total: count ?? 0 };
+  },
+
   /**
    * Queues a capture for each target (group codes and/or 'vlog') and starts uploading. The file is
    * copied out of the camera cache first so the OS can't purge it before the upload finishes.

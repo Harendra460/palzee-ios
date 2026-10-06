@@ -57,8 +57,8 @@
 		E4E9E60CC55F4D3A8981352E /* dela_gothic_one_regular.ttf */ = {isa = PBXFileReference; explicitFileType = undefined; fileEncoding = undefined; includeInIndex = 0; lastKnownFileType = unknown; name = dela_gothic_one_regular.ttf; path = ../assets/fonts/dela_gothic_one_regular.ttf; sourceTree = "<group>"; };
 		ED297162215061F000B7C4FE /* JavaScriptCore.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = JavaScriptCore.framework; path = System/Library/Frameworks/JavaScriptCore.framework; sourceTree = SDKROOT; };
 		F11748412D0307B40044C1D9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = AppDelegate.swift; path = Palzee/AppDelegate.swift; sourceTree = "<group>"; };
-		F11748512D0307B40044C1D9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = Palzee/SceneDelegate.swift; sourceTree = "<group>"; };
 		F11748442D0722820044C1D9 /* Palzee-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; name = "Palzee-Bridging-Header.h"; path = "Palzee/Palzee-Bridging-Header.h"; sourceTree = "<group>"; };
+		F11748512D0307B40044C1D9 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = SceneDelegate.swift; path = Palzee/SceneDelegate.swift; sourceTree = "<group>"; };
 		F140B3DCB53060C27CDDF6FC /* Pods-Palzee.debug.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-Palzee.debug.xcconfig"; path = "Target Support Files/Pods-Palzee/Pods-Palzee.debug.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 

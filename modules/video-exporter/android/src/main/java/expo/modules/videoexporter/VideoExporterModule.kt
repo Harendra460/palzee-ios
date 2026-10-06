@@ -19,6 +19,7 @@ import androidx.media3.effect.BitmapOverlay
 import androidx.media3.effect.OverlayEffect
 import androidx.media3.effect.Presentation
 import androidx.media3.effect.ScaleAndRotateTransformation
+import androidx.media3.effect.TextureOverlay
 import androidx.media3.transformer.Composition
 import androidx.media3.transformer.DefaultEncoderFactory
 import androidx.media3.transformer.EditedMediaItem
@@ -105,10 +106,11 @@ class VideoExporterModule : Module() {
     }
 
     val output = File(context.cacheDir, "${outputPrefix}_${UUID.randomUUID()}.mp4")
-    val composition = Composition.Builder(ImmutableList.of(EditedMediaItemSequence(items)))
+    val sequence = EditedMediaItemSequence.Builder(items)
       // Generates silence for clips recorded without audio so the sequence keeps one audio track.
       .experimentalSetForceAudioTrack(true)
       .build()
+    val composition = Composition.Builder(sequence).build()
 
     Handler(Looper.getMainLooper()).post {
       try {
@@ -149,7 +151,7 @@ class VideoExporterModule : Module() {
     // Aspect-fill into the 16:9 card, then letterbox the card into the 9:16 canvas.
     effects.add(Presentation.createForAspectRatio(16f / 9f, Presentation.LAYOUT_SCALE_TO_FIT_WITH_CROP))
     effects.add(Presentation.createForWidthAndHeight(CANVAS_W, CANVAS_H, Presentation.LAYOUT_SCALE_TO_FIT))
-    effects.add(OverlayEffect(ImmutableList.of(BitmapOverlay.createStaticBitmapOverlay(renderOverlay(overlay)))))
+    effects.add(OverlayEffect(listOf<TextureOverlay>(BitmapOverlay.createStaticBitmapOverlay(renderOverlay(overlay)))))
 
     return EditedMediaItem.Builder(MediaItem.fromUri(uri))
       .setEffects(Effects(ImmutableList.of(), ImmutableList.copyOf(effects)))

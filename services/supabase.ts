@@ -14,5 +14,7 @@ export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
     autoRefreshToken: true,
     persistSession: true,
     detectSessionInUrl: false,
+    // PKCE so browser-based OAuth (Apple on Android, Google on iOS) returns a ?code= we can exchange.
+    flowType: 'pkce',
   },
 });

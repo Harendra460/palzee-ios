@@ -7,32 +7,33 @@
       "ios",
       "android"
     ],
-    "orientation": "default",
+    "orientation": "portrait",
     "icon": "./assets/images/pal_logo.png",
     "userInterfaceStyle": "automatic",
     "splash": {
       "image": "./assets/images/pal_logo.png",
       "resizeMode": "contain",
-      "backgroundColor": "#F7F6F3"
+      "backgroundColor": "#F6F4FF"
     },
     "ios": {
       "supportsTablet": false,
       "bundleIdentifier": "com.pratham.palzee",
       "entitlements": {
-        "aps-environment": null
+        "aps-environment": null,
+        "com.apple.developer.applesignin": [
+          "Default"
+        ]
       },
       "infoPlist": {
         "UISupportedInterfaceOrientations": [
-          "UIInterfaceOrientationPortrait",
-          "UIInterfaceOrientationPortraitUpsideDown",
-          "UIInterfaceOrientationLandscapeLeft",
-          "UIInterfaceOrientationLandscapeRight"
+          "UIInterfaceOrientationPortrait"
         ],
         "NSCameraUsageDescription": "Palzee needs access to your camera to capture photos and videos for your daily pal feed.",
         "NSMicrophoneUsageDescription": "Palzee needs access to your microphone to record audio for videos.",
         "NSPhotoLibraryUsageDescription": "Palzee needs access to your photo library to pick images and videos.",
         "NSPhotoLibraryAddUsageDescription": "Palzee needs access to save captured media to your photo library."
-      }
+      },
+      "usesAppleSignIn": true
     },
     "plugins": [
       "expo-router",
@@ -63,7 +64,6 @@
           ]
         }
       ],
-      "expo-secure-store",
       "expo-web-browser",
       [
         "expo-media-library",
@@ -100,7 +100,10 @@
         }
       ],
       "./plugins/withAndroidLauncherIcons",
-      "./plugins/withFirebaseNotificationMetaOverride"
+      "./plugins/withFirebaseNotificationMetaOverride",
+      [
+        "expo-apple-authentication"
+      ]
     ],
     "scheme": "io.supabase.pals",
     "android": {
