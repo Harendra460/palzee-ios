@@ -6,12 +6,19 @@ import { sessionStore } from '../utils/sessionStore';
 import { authService } from '../services/authService';
 import { cameraWarmupStore } from '../utils/cameraWarmupStore';
 import { User } from '../types';
+import { pushService } from '../services/pushService';
 
 export default function Index() {
   const [loading, setLoading] = useState(true);
   const [currentUser, setCurrentUser] = useState<User | null>(null);
   const [selectedThemeColor, setSelectedThemeColor] = useState('blue');
   const [autoOpenCreateModal, setAutoOpenCreateModal] = useState(false);
+
+  useEffect(() => {
+    let stopPush: (() => void) | undefined;
+    pushService.init().then((stop) => (stopPush = stop)).catch(() => {});
+    return () => stopPush?.();
+  }, []);
 
   useEffect(() => {
     async function initSession() {

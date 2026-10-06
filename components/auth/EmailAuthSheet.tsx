@@ -55,11 +55,11 @@ export const EmailAuthSheet: React.FC<EmailAuthSheetProps> = ({
     setErrorMsg(null);
     const res = await authService.verifyEmailOtp(email, otp);
     setLoading(false);
-    if (res.success && res.user) {
+    if (res.success) {
       onSuccess(res.user);
       onClose();
     } else {
-      setErrorMsg(res.error || 'Invalid verification code');
+      setErrorMsg(res.error);
     }
   };
 

@@ -273,11 +273,8 @@ export const PasskeyTypewriterFlow: React.FC<PasskeyTypewriterFlowProps> = ({
         setCreatedUser(res.passkeyUser);
         startPermissionsFlow();
       } else {
-        const fallbackRes = await authService.registerTemporaryPasskey(
-          fullName,
-          email
-        );
-        if (fallbackRes.success && fallbackRes.user) {
+        const fallbackRes = await authService.registerTemporaryPasskey(firstName, lastName, email);
+        if (fallbackRes.success) {
           setCreatedUser(fallbackRes.user);
           startPermissionsFlow();
         } else {

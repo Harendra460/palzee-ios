@@ -4,6 +4,7 @@ export interface User {
   displayName: string;
   isPasskeyRegistered: boolean;
   authProvider?: string;
+  avatarUrl?: string | null;
 }
 
 export enum UserRouteState {
