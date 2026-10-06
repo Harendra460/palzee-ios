@@ -3,6 +3,7 @@ import { LogBox } from 'react-native';
 import { Stack } from 'expo-router';
 import { useFonts } from 'expo-font';
 import * as SplashScreen from 'expo-splash-screen';
+import { StatusBar } from 'expo-status-bar';
 import { Audio } from 'expo-av';
 
 LogBox.ignoreLogs([
@@ -62,8 +63,11 @@ export default function RootLayout() {
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="index" />
-    </Stack>
+    <>
+      <StatusBar style="auto" />
+      <Stack screenOptions={{ headerShown: false }}>
+        <Stack.Screen name="index" />
+      </Stack>
+    </>
   );
 }

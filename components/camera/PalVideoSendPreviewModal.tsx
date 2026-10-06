@@ -22,7 +22,7 @@ import { Image } from 'expo-image';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Video, ResizeMode, Audio } from 'expo-av';
 import { Ionicons } from '@expo/vector-icons';
-import { SymbolView } from 'expo-symbols';
+import { PlatformSymbol as SymbolView } from '../ui/PlatformSymbol';
 import { BlurView } from 'expo-blur';
 import Svg, { Defs, LinearGradient, Stop, Rect, Circle, Path } from 'react-native-svg';
 import { Colors } from '../../constants/colors';
@@ -30,7 +30,7 @@ import { Fonts } from '../../constants/typography';
 import { useFastColorScheme } from '../../hooks/useFastColorScheme';
 import { DynamicGlowContainer } from '../ui/DynamicGlowContainer';
 import * as MediaLibrary from 'expo-media-library';
-import { requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
+import { ensureMediaSavePermission } from '../../utils/mediaSave';
 
 const shouldSuppressExpoAv = (...args: any[]) => {
   try {
@@ -220,9 +220,10 @@ export default function PalVideoSendPreviewModal({
     }
     setSaveRawState('saving');
     try {
-      try {
-        await requestMediaLibraryPermissionsAsync();
-      } catch (e) {}
+      if (!(await ensureMediaSavePermission())) {
+        setSaveRawState('idle');
+        return;
+      }
       await MediaLibrary.saveToLibraryAsync(videoUri);
       setSaveRawState('saved');
     } catch (err) {

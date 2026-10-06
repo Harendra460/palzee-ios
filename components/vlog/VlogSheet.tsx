@@ -24,6 +24,8 @@ import { BlurView } from 'expo-blur';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Fonts } from '../../constants/typography';
 import { Colors } from '../../constants/colors';
+import { VideoExporter } from '../../modules/video-exporter';
+import { ensureMediaSavePermission } from '../../utils/mediaSave';
 import { LiquidGlassIconButton, LiquidGlassCapsule, DynamicGlowContainer } from '../ui';
 import { ActivityIndicator } from 'react-native';
 import * as MediaLibrary from 'expo-media-library';
@@ -294,9 +296,8 @@ export const VlogSheet: React.FC<VlogSheetProps> = ({
     if (saveState === 'saving') return;
     setSaveState('saving');
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status === 'granted') {
-        const TargetExporter = NativeModules.VideoExporter;
+      if (await ensureMediaSavePermission()) {
+        const TargetExporter = VideoExporter;
         if (TargetExporter && TargetExporter.exportPortraitVideoWithCaption) {
           const formattedTimeText = formatExportTime(currentClip?.timestamp || timestamp, (currentClip as any)?.displayTime);
           const exportedUri = await TargetExporter.exportPortraitVideoWithCaption(

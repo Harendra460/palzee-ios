@@ -16,7 +16,7 @@ import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { CameraView, CameraType, FlashMode, useCameraPermissions, useMicrophonePermissions } from 'expo-camera';
 import Svg, { Circle, Defs, LinearGradient, Stop, Rect } from 'react-native-svg';
 import { BlurView } from 'expo-blur';
-import { SymbolView } from 'expo-symbols';
+import { PlatformSymbol as SymbolView } from '../ui/PlatformSymbol';
 import { Ionicons } from '@expo/vector-icons';
 import { Colors } from '../../constants/colors';
 import { Fonts } from '../../constants/typography';

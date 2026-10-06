@@ -20,6 +20,8 @@ export const getLiveSandboxUri = (storedUri?: string): string => {
   if (storedUri.startsWith('http://') || storedUri.startsWith('https://') || storedUri.startsWith('ph://')) {
     return storedUri;
   }
+  // Android app-storage paths are stable across reinstalls and updates; only iOS container GUIDs move.
+  if (Platform.OS !== 'ios') return storedUri;
   const fileName = storedUri.split('/').pop();
   if (!fileName || !FileSystem || !FileSystem.documentDirectory) return storedUri;
 

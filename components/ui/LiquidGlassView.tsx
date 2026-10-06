@@ -159,7 +159,7 @@ export const LiquidGlassPillBackground: React.FC<LiquidGlassPillBackgroundProps>
         }
       }}
     >
-      {!reduceTransparency && (
+      {!reduceTransparency && Platform.OS === 'ios' && (
         <BlurView
           key={`blur_${idPrefix}_${variant}_${isDark ? 'dark' : 'light'}`}
           intensity={preset.blurIntensity}
@@ -272,7 +272,7 @@ export const LiquidGlassCapsule: React.FC<LiquidGlassCapsuleProps> = ({
           borderCurve: 'continuous',
         }}
       >
-        {!reduceTransparency && (
+        {!reduceTransparency && Platform.OS === 'ios' && (
           <BlurView
             key={`blur_${idPrefix}_${variant}_${isDark ? 'dark' : 'light'}`}
             intensity={preset.blurIntensity}
@@ -380,7 +380,7 @@ export const LiquidGlass: React.FC<LiquidGlassProps> = ({
         ]}
       >
         {/* 1. Lensing Backdrop Blur */}
-        {!reduceTransparency && (
+        {!reduceTransparency && Platform.OS === 'ios' && (
           <BlurView
             key={`blur_view_${variant}_${isDark ? 'dark' : 'light'}`}
             intensity={preset.blurIntensity}

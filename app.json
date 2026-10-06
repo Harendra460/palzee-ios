@@ -4,7 +4,8 @@
     "slug": "palzee-ios",
     "version": "1.0.0",
     "platforms": [
-      "ios"
+      "ios",
+      "android"
     ],
     "orientation": "default",
     "icon": "./assets/images/pal_logo.png",
@@ -38,7 +39,9 @@
       [
         "expo-camera",
         {
-          "cameraPermission": "Palzee needs camera permission to capture daily pal moments."
+          "cameraPermission": "Palzee needs camera permission to capture daily pal moments.",
+          "microphonePermission": "Palzee needs access to your microphone to record audio for videos.",
+          "recordAudioAndroid": true
         }
       ],
       [
@@ -61,8 +64,81 @@
         }
       ],
       "expo-secure-store",
-      "expo-web-browser"
+      "expo-web-browser",
+      [
+        "expo-media-library",
+        {
+          "photosPermission": "Palzee needs access to your photo library to pick images and videos.",
+          "savePhotosPermission": "Palzee needs access to save captured media to your photo library.",
+          "isAccessMediaLocationEnabled": false,
+          "granularPermissions": [
+            "photo",
+            "video"
+          ]
+        }
+      ],
+      [
+        "expo-image-picker",
+        {
+          "photosPermission": "Palzee needs access to your photo library to pick images and videos."
+        }
+      ],
+      [
+        "expo-notifications",
+        {
+          "icon": "./assets/images/ic_status_bar_silhouette.png",
+          "color": "#5218ED",
+          "defaultChannel": "default_app_channel"
+        }
+      ],
+      [
+        "expo-build-properties",
+        {
+          "android": {
+            "minSdkVersion": 29
+          }
+        }
+      ],
+      "./plugins/withAndroidLauncherIcons",
+      "./plugins/withFirebaseNotificationMetaOverride"
     ],
-    "scheme": "io.supabase.pals"
+    "scheme": "io.supabase.pals",
+    "android": {
+      "package": "com.finrein.pals",
+      "edgeToEdgeEnabled": true,
+      "softwareKeyboardLayoutMode": "resize",
+      "permissions": [
+        "android.permission.CAMERA",
+        "android.permission.RECORD_AUDIO",
+        "android.permission.POST_NOTIFICATIONS",
+        "android.permission.READ_MEDIA_IMAGES",
+        "android.permission.READ_MEDIA_VIDEO",
+        "android.permission.READ_MEDIA_VISUAL_USER_SELECTED",
+        "android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS"
+      ],
+      "blockedPermissions": [
+        "android.permission.SYSTEM_ALERT_WINDOW",
+        "android.permission.READ_MEDIA_AUDIO",
+        "android.permission.READ_EXTERNAL_STORAGE",
+        "android.permission.WRITE_EXTERNAL_STORAGE"
+      ],
+      "intentFilters": [
+        {
+          "action": "VIEW",
+          "category": [
+            "BROWSABLE",
+            "DEFAULT"
+          ],
+          "data": [
+            {
+              "scheme": "io.supabase.pals",
+              "host": "login-callback"
+            }
+          ]
+        }
+      ],
+      "versionCode": 1,
+      "allowBackup": false
+    }
   }
 }

@@ -18,7 +18,7 @@ import {
   Easing,
 } from 'react-native';
 import { Image } from 'expo-image';
-import { requestMediaLibraryPermissionsAsync } from 'expo-image-picker';
+import { ensureMediaSavePermission, shareVideoFile } from '../../utils/mediaSave';
 import * as MediaLibrary from 'expo-media-library';
 import * as FileSystem from 'expo-file-system/legacy';
 import { Video, ResizeMode } from 'expo-av';
@@ -26,10 +26,10 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSafeAreaInsets } from 'react-native-safe-area-context';
 import { Fonts } from '../../constants/typography';
 import { Colors } from '../../constants/colors';
+import { VideoExporter } from '../../modules/video-exporter';
 import { LiquidGlassIconButton, DynamicGlowContainer } from '../ui';
 import { getLiveSandboxUri, getClipsForDayOffset } from '../../utils/mediaUtils';
 
-const { VideoExporter } = NativeModules;
 
 // Final Export Output Canvas Geometry: 9:16 Portrait (1080x1920)
 export const EXPORT_CANVAS_WIDTH = 1080;
@@ -188,7 +188,7 @@ export const EditExportSheet: React.FC<EditExportSheetProps> = ({
 
   // Native AVFoundation Video Processing to 1080x1920 9:16 Portrait Canvas Slideshow
   const processAndSaveVideo = async (): Promise<string> => {
-    const TargetExporter = NativeModules.VideoExporter;
+    const TargetExporter = VideoExporter;
 
     if (list && list.length > 0) {
       const chronologicalList = list;
@@ -244,10 +244,9 @@ export const EditExportSheet: React.FC<EditExportSheetProps> = ({
 
     setSaveState('saving');
     try {
-      try {
-        await requestMediaLibraryPermissionsAsync(true);
-      } catch (pErr) {
-        console.log('Permission error:', pErr);
+      if (!(await ensureMediaSavePermission())) {
+        setSaveState('idle');
+        return;
       }
 
       const processedUri = await processAndSaveVideo();
@@ -274,17 +273,9 @@ export const EditExportSheet: React.FC<EditExportSheetProps> = ({
       if (currentClip && currentClip.uri) {
         const processedUri = await processAndSaveVideo();
 
-        await Share.share(
-          {
-            url: processedUri,
-            title: 'collection_export',
-            message: 'collection_export',
-          },
-          {
-            dialogTitle: 'collection_export',
-            subject: 'collection_export',
-          }
-        );
+        if (processedUri) {
+          await shareVideoFile(processedUri, 'collection_export');
+        }
       }
     } catch (error) {
       console.log('Share error:', error);

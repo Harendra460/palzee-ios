@@ -101,7 +101,7 @@ export const LiquidGlassIconButton: React.FC<LiquidGlassIconButtonProps> = ({
           },
         ]}
       >
-        {!reduceTransparency && (
+        {!reduceTransparency && Platform.OS === 'ios' && (
           <BlurView
             key={`blur_${idPrefix}_${variant}_${isDark ? 'dark' : 'light'}`}
             intensity={blurIntensity}

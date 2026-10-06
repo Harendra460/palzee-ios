@@ -10,6 +10,7 @@ import {
   KeyboardAvoidingView,
   Modal,
   Platform,
+  BackHandler,
   ScrollView,
   StyleSheet,
   Text,
@@ -31,13 +32,15 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import Svg, { Circle, Defs, LinearGradient, Path, RadialGradient, Rect, Stop, Text as SvgText } from 'react-native-svg';
 import { Ionicons } from '@expo/vector-icons';
 import { BlurView } from 'expo-blur';
-import { SymbolView } from 'expo-symbols';
+import { PlatformSymbol as SymbolView } from '../../components/ui/PlatformSymbol';
 import * as ImagePicker from 'expo-image-picker';
 import * as FileSystem from 'expo-file-system/legacy';
 
 import { InAppBrowserModal } from '../../components/ui/InAppBrowserModal';
 import { Fonts } from '../../constants/typography';
 import { Colors } from '../../constants/colors';
+import { VideoExporter } from '../../modules/video-exporter';
+import { ensureMediaSavePermission } from '../../utils/mediaSave';
 import { getNearestHourText, formatExactTime, generateVideoThumbnail, getLiveSandboxUri, getClipsForDayOffset, parseToDate } from '../../utils/mediaUtils';
 import { DynamicGlowContainer } from '../../components/ui/DynamicGlowContainer';
 import { LiquidGlass } from '../../components/ui/LiquidGlassView';
@@ -556,6 +559,50 @@ export default function HomeScreen({
     }
   }, [activeTab]);
 
+  // Android hardware back: close the top-most overlay instead of exiting the app. Most sheets here
+  // are absolutely-positioned views rather than <Modal>s, so they never receive onRequestClose.
+  useEffect(() => {
+    if (Platform.OS !== 'android') return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (inAppBrowserUrl) { setInAppBrowserUrl(null); return true; }
+      if (showEditNameModal) { setShowEditNameModal(false); return true; }
+      if (showViewingPalsGuide) { setShowViewingPalsGuide(false); return true; }
+      if (showProfileMenu) {
+        if (profileSubMenu !== 'main') setProfileSubMenu('main');
+        else setShowProfileMenu(false);
+        return true;
+      }
+      if (showAddMenu) { setShowAddMenu(false); return true; }
+      if (showEditExportSheet) { setShowEditExportSheet(false); return true; }
+      if (showExportSheet) { setShowExportSheet(false); return true; }
+      if (showChatDrawer) { setShowChatDrawer(false); return true; }
+      if (showActivityDrawer) { setShowActivityDrawer(false); return true; }
+      if (showCreateModal) { setShowCreateModal(false); return true; }
+      if (activePalGroupDetails) { setActivePalGroupDetails(null); return true; }
+      if (showCamera) { setShowCamera(false); return true; }
+      if (showGroupsView) { setShowGroupsView(false); return true; }
+      if (activeTab === 'camera') { setActiveTab('pals'); return true; }
+      return false;
+    });
+    return () => sub.remove();
+  }, [
+    inAppBrowserUrl,
+    showEditNameModal,
+    showViewingPalsGuide,
+    showProfileMenu,
+    profileSubMenu,
+    showAddMenu,
+    showEditExportSheet,
+    showExportSheet,
+    showChatDrawer,
+    showActivityDrawer,
+    showCreateModal,
+    activePalGroupDetails,
+    showCamera,
+    showGroupsView,
+    activeTab,
+  ]);
+
   // Accelerometer tilt detection for "rotate to capture"
   useEffect(() => {
     let subscription: { remove: () => void } | null = null;
@@ -571,9 +618,12 @@ export default function HomeScreen({
       let isTilted = false;
 
       subscription = Accelerometer.addListener((data: any) => {
-        const x = data?.x ?? 0;
-        const y = data?.y ?? 0;
-        const z = data?.z ?? 0;
+        // Android reports the reaction to gravity (upright y ≈ +1), iOS reports gravity itself
+        // (upright y ≈ -1); flip Android so the iOS-calibrated thresholds below apply to both.
+        const sign = Platform.OS === 'android' ? -1 : 1;
+        const x = sign * (data?.x ?? 0);
+        const y = sign * (data?.y ?? 0);
+        const z = sign * (data?.z ?? 0);
 
         // Disable tilt if user manually selected tab via bottom nav bar or if any modal/view is active
         if (
@@ -836,9 +886,8 @@ export default function HomeScreen({
     if (homeSaveState === 'saving') return;
     setHomeSaveState('saving');
     try {
-      const { status } = await MediaLibrary.requestPermissionsAsync();
-      if (status === 'granted') {
-        const TargetExporter = NativeModules.VideoExporter;
+      if (await ensureMediaSavePermission()) {
+        const TargetExporter = VideoExporter;
         if (TargetExporter && TargetExporter.exportRotatedCardVideoOnly) {
           const exportedUri = await TargetExporter.exportRotatedCardVideoOnly(String(activeVideoUri || ''), String(activeCaption || ''));
           if (exportedUri) {
@@ -877,7 +926,7 @@ export default function HomeScreen({
 
     try {
       // 1. Copy video to permanent Documents directory
-      const fileName = `vlog_${Date.now()}.mov`;
+      const fileName = `vlog_${Date.now()}.${Platform.OS === 'android' ? 'mp4' : 'mov'}`;
       const destPath = `${FileSystem.documentDirectory}${fileName}`;
       await FileSystem.copyAsync({ from: uri, to: destPath });
       permanentUri = destPath;

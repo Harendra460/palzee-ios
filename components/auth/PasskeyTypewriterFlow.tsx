@@ -2,6 +2,7 @@ import React, { useEffect, useRef, useState } from 'react';
 import {
   Alert,
   Animated,
+  BackHandler,
   Linking,
   Modal,
   Platform,
@@ -55,6 +56,19 @@ export const PasskeyTypewriterFlow: React.FC<PasskeyTypewriterFlowProps> = ({
   const [micPermission, requestMicPermission] = useMicrophonePermissions();
 
   const [step, setStep] = useState<FlowStep>('FIRST_NAME');
+
+  // Android hardware back steps back through the name screens instead of exiting the app; it is
+  // swallowed while the account is being created or permissions are being requested.
+  useEffect(() => {
+    if (!visible || Platform.OS !== 'android') return;
+    const sub = BackHandler.addEventListener('hardwareBackPress', () => {
+      if (step === 'LAST_NAME') setStep('FIRST_NAME');
+      else if (step === 'CONFIRM') setStep('LAST_NAME');
+      else if (step === 'FIRST_NAME' || step === 'FAILED') onClose();
+      return true;
+    });
+    return () => sub.remove();
+  }, [visible, step, onClose]);
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
   const [dots, setDots] = useState('.');
@@ -287,7 +301,7 @@ export const PasskeyTypewriterFlow: React.FC<PasskeyTypewriterFlowProps> = ({
         } else if (!res?.canAskAgain) {
           Alert.alert(
             'Camera Access Required',
-            'Palzee needs Camera access to capture moments with friends. Please enable Camera in iOS Settings.',
+            'Palzee needs Camera access to capture moments with friends. Please enable Camera in Settings.',
             [
               { text: 'Later', style: 'cancel' },
               { text: 'Open Settings', onPress: () => Linking.openSettings() },
@@ -310,7 +324,7 @@ export const PasskeyTypewriterFlow: React.FC<PasskeyTypewriterFlowProps> = ({
         } else if (!res?.canAskAgain) {
           Alert.alert(
             'Microphone Access Required',
-            'Palzee needs Microphone access to record sound with your videos. Please enable Microphone in iOS Settings.',
+            'Palzee needs Microphone access to record sound with your videos. Please enable Microphone in Settings.',
             [
               { text: 'Later', style: 'cancel' },
               { text: 'Open Settings', onPress: () => Linking.openSettings() },
